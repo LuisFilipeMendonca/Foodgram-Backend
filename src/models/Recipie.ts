@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface IRecipie {
+interface IRecipie extends mongoose.Document {
   name: string;
   duration: number;
   servings: number;
@@ -10,13 +10,16 @@ interface IRecipie {
   votesCount: number;
   ingredients: string[];
   steps: string[];
+  user: {
+    type: mongoose.Schema.Types.ObjectId;
+  };
 }
 
 interface IRecipieModel extends mongoose.Model<any> {
   build(attr: IRecipie): any;
 }
 
-const recipieSchema = new mongoose.Schema(
+const recipieSchema = new mongoose.Schema<IRecipie, IRecipieModel>(
   {
     name: {
       type: String,
@@ -54,6 +57,11 @@ const recipieSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -62,6 +70,9 @@ recipieSchema.statics.build = (attr: IRecipie) => {
   return new Recipie(attr);
 };
 
-const Recipie = mongoose.model<any, IRecipieModel>("Recipie", recipieSchema);
+const Recipie = mongoose.model<IRecipie, IRecipieModel>(
+  "Recipie",
+  recipieSchema
+);
 
 export { Recipie };

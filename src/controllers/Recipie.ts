@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
 import { Recipie } from "../models/Recipie";
+import { User } from "../models/User";
 
 class RecipieController {
   async postRecipie(req: Request, res: Response) {
     try {
       const recipie = Recipie.build(req.body);
+      const user = await User.findById(req.body.user);
 
+      user.recipies.push(recipie);
+
+      await user.save();
       await recipie.save();
 
       return res.status(200).json(recipie);
@@ -16,7 +21,7 @@ class RecipieController {
 
   async getRecipies(req: Request, res: Response) {
     try {
-      const recipies = await Recipie.find();
+      const recipies = await Recipie.find().populate("user", "name");
 
       return res.status(200).json(recipies);
     } catch (e) {
