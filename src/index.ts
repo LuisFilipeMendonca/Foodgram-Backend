@@ -1,7 +1,8 @@
 import express, { Application } from "express";
 import mongoose from "mongoose";
 
-import recipiesRouter from "./routes/recipies";
+import recipiesRoutes from "./routes/recipies";
+import userRoutes from "./routes/users";
 
 class App {
   app: Application;
@@ -17,7 +18,8 @@ class App {
   }
 
   private routes() {
-    this.app.use("/recipies", recipiesRouter);
+    this.app.use("/recipies", recipiesRoutes);
+    this.app.use("/users", userRoutes);
   }
 }
 

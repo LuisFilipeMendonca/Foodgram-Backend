@@ -12,7 +12,7 @@ interface IRecipie {
   steps: string[];
 }
 
-interface RecipieModelInterface extends mongoose.Model<any> {
+interface IRecipieModel extends mongoose.Model<any> {
   build(attr: IRecipie): any;
 }
 
@@ -42,7 +42,7 @@ const recipieSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    votesQtt: {
+    votesCount: {
       type: Number,
       default: 0,
     },
@@ -62,9 +62,6 @@ recipieSchema.statics.build = (attr: IRecipie) => {
   return new Recipie(attr);
 };
 
-const Recipie = mongoose.model<any, RecipieModelInterface>(
-  "Recipie",
-  recipieSchema
-);
+const Recipie = mongoose.model<any, IRecipieModel>("Recipie", recipieSchema);
 
 export { Recipie };

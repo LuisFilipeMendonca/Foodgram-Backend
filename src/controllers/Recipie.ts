@@ -28,7 +28,29 @@ class RecipieController {
     try {
       const recipie = await Recipie.findById(req.params.id);
 
-      console.log(recipie);
+      return res.status(200).json(recipie);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async updateRecipie(req: Request, res: Response) {
+    try {
+      const recipie = await Recipie.findByIdAndUpdate(
+        req.params.id,
+        { $set: { ...req.body } },
+        { new: true }
+      );
+
+      return res.status(200).json(recipie);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async deleteRecipie(req: Request, res: Response) {
+    try {
+      const recipie = await Recipie.findByIdAndDelete(req.params.id);
 
       return res.status(200).json(recipie);
     } catch (e) {
