@@ -23,6 +23,8 @@ class RecipieController {
     try {
       const recipies = await Recipie.find().populate("user", "name");
 
+      console.log(res.locals.userId);
+
       return res.status(200).json(recipies);
     } catch (e) {
       console.log(e);

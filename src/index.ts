@@ -1,8 +1,12 @@
 import express, { Application } from "express";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
 import recipiesRoutes from "./routes/recipies";
 import userRoutes from "./routes/users";
+import tokenRoutes from "./routes/token";
+
+dotenv.config();
 
 class App {
   app: Application;
@@ -20,11 +24,14 @@ class App {
   private routes() {
     this.app.use("/recipies", recipiesRoutes);
     this.app.use("/users", userRoutes);
+    this.app.use("/token", tokenRoutes);
   }
 }
 
+const uri = process.env.DB_URI || "";
+
 mongoose.connect(
-  "mongodb+srv://luisMendonca:rapenghtler@cluster0.5x6bn.mongodb.net/foodgram?retryWrites=true&w=majority",
+  uri,
   {
     useCreateIndex: true,
     useNewUrlParser: true,
