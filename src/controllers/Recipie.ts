@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Recipie } from "../models/Recipie";
 import { User } from "../models/User";
+import { Rating } from "../models/Rating";
 
 class RecipieController {
   async postRecipie(req: Request, res: Response) {
@@ -21,7 +22,11 @@ class RecipieController {
 
   async getRecipies(req: Request, res: Response) {
     try {
-      const recipies = await Recipie.find().populate("user", "name");
+      const recipies = await Recipie.find()
+        .populate("user", "name")
+        .populate("ratings", {
+          match: { user: res.locals.userId },
+        });
 
       console.log(res.locals.userId);
 

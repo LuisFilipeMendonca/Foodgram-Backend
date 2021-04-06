@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import recipiesRoutes from "./routes/recipies";
 import userRoutes from "./routes/users";
 import tokenRoutes from "./routes/token";
+import ratingsRoutes from "./routes/ratings";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ class App {
     this.app.use("/recipies", recipiesRoutes);
     this.app.use("/users", userRoutes);
     this.app.use("/token", tokenRoutes);
+    this.app.use("/ratings", ratingsRoutes);
   }
 }
 
