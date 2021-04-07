@@ -22,15 +22,21 @@ class RecipieController {
 
   async getRecipies(req: Request, res: Response) {
     try {
+      const { page, limit } = req.params;
+      const skip = (+page - 1) * +limit;
+
       const recipies = await Recipie.find()
+        .sort([["createdAt", -1]])
+        .skip(skip)
+        .limit(+limit)
         .populate("user", "name")
         .populate("ratings", {
           match: { user: res.locals.userId },
         });
 
-      console.log(res.locals.userId);
+      const count = await Recipie.countDocuments();
 
-      return res.status(200).json(recipies);
+      return res.status(200).json({ recipies, count });
     } catch (e) {
       console.log(e);
     }
