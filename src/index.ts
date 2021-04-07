@@ -1,6 +1,8 @@
 import express, { Application } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
+import { resolve } from "path";
 
 import recipiesRoutes from "./routes/recipies";
 import userRoutes from "./routes/users";
@@ -20,6 +22,8 @@ class App {
   private middlewares() {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
+    this.app.use(cors());
+    this.app.use(express.static(resolve(__dirname, "..", "uploads")));
   }
 
   private routes() {

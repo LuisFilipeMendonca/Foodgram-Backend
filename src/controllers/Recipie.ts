@@ -1,13 +1,18 @@
 import { Request, Response } from "express";
 import { Recipie } from "../models/Recipie";
 import { User } from "../models/User";
-import { Rating } from "../models/Rating";
 
 class RecipieController {
   async postRecipie(req: Request, res: Response) {
     try {
-      const recipie = Recipie.build(req.body);
-      const user = await User.findById(req.body.user);
+      const data = {
+        ...req.body,
+        photo: req.file.filename,
+        user: res.locals.userId._id,
+      };
+
+      const recipie = Recipie.build(data);
+      const user = await User.findById(res.locals.userId._id);
 
       user.recipies.push(recipie);
 

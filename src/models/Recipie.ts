@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 interface IRecipie extends mongoose.Document {
+  photo: string;
   name: string;
   duration: number;
   servings: number;
@@ -19,6 +20,10 @@ interface IRecipieModel extends mongoose.Model<any> {
 
 const recipieSchema = new mongoose.Schema<IRecipie, IRecipieModel>(
   {
+    photo: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -67,12 +72,16 @@ const recipieSchema = new mongoose.Schema<IRecipie, IRecipieModel>(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 recipieSchema.statics.build = (attr: IRecipie) => {
   return new Recipie(attr);
 };
+
+recipieSchema.virtual("photoUrl").get(function (this: IRecipie) {
+  return `http://localhost:3001/images/${this.photo}`;
+});
 
 const Recipie = mongoose.model<IRecipie, IRecipieModel>(
   "Recipie",
