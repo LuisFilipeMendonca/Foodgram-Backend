@@ -30,10 +30,19 @@ class RecipieController {
       const { page, limit } = req.params;
       const skip = (+page - 1) * +limit;
 
+      const { order, value } = req.query;
+
+      let sort = ["createdAt", -1];
+
+      if (order && value) {
+        sort = [order.toString(), +value];
+      }
+
       const recipies = await Recipie.find()
-        .sort([["createdAt", -1]])
+        .sort([sort])
         .skip(skip)
         .limit(+limit)
+        // .select("_id name photo votes votesCount")
         .populate("user", "name")
         .populate("ratings", {
           match: { user: res.locals.userId },
