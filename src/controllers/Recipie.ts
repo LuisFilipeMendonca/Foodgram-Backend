@@ -30,19 +30,19 @@ class RecipieController {
       const { page, limit } = req.params;
       const skip = (+page - 1) * +limit;
 
-      const { order, value } = req.query;
+      const { order } = req.query;
 
-      let sort = ["createdAt", -1];
+      let sort;
 
-      if (order && value) {
-        sort = [order.toString(), +value];
-      }
+      if (order === "recent") sort = ["createdAt", -1];
+      if (order === "old") sort = ["createdAt", 1];
+      if (order === "highStars") sort = ["stars", -1];
+      if (order === "lowStars") sort = ["stars", 1];
 
       const recipies = await Recipie.find()
         .sort([sort])
         .skip(skip)
         .limit(+limit)
-        // .select("_id name photo votes votesCount")
         .populate("user", "name")
         .populate("ratings", {
           match: { user: res.locals.userId },
