@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 interface IUser extends mongoose.Document {
-  name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -12,18 +12,22 @@ interface IUserModel extends mongoose.Model<any> {
 }
 
 const userSchema = new mongoose.Schema<IUser, IUserModel>({
-  name: {
+  username: {
     type: String,
-    required: true,
+    required: [true, "Please provide a value to this field."],
   },
   email: {
     type: String,
     required: true,
-    unique: true,
+    match: [
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      "Please provide a valid email",
+    ],
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Please provide a value to this field"],
+    minLength: [6, "Your password must have at least 6 characters"],
   },
   recipies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipie" }],
 });
@@ -36,6 +40,7 @@ userSchema.methods.isPasswordValid = async function (compPassword: string) {
   return await bcrypt.compare(compPassword, this.password);
 };
 
+// Uses a pre-save hook to hash the password
 userSchema.pre("save", async function (next) {
   try {
     if (!this.isModified("password")) return next();
@@ -49,6 +54,14 @@ userSchema.pre("save", async function (next) {
     console.log(e);
   }
 });
+
+// Validates email field returning a Validation Error
+userSchema.path("email").validate(async (value: string) => {
+  const emailExists = await mongoose.models.User.countDocuments({
+    email: value,
+  });
+  return !emailExists;
+}, "Email already exists");
 
 const User = mongoose.model<IUser, IUserModel>("User", userSchema);
 
