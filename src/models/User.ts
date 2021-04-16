@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 interface IUser extends mongoose.Document {
   username: string;
   email: string;
   password: string;
+  resetPasswordToken: string;
+  resetPasswordExpiresIn: number;
 }
 
 interface IUserModel extends mongoose.Model<any> {
@@ -31,6 +34,8 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     minLength: [6, "Your password must have at least 6 characters"],
   },
   recipies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipie" }],
+  resetPasswordToken: String,
+  resetPasswordExpiresIn: Date,
 });
 
 userSchema.statics.build = (attr: IUser) => {
@@ -40,6 +45,18 @@ userSchema.statics.build = (attr: IUser) => {
 // Validates password field
 userSchema.methods.isPasswordValid = async function (compPassword: string) {
   return await bcrypt.compare(compPassword, this.password);
+};
+
+userSchema.methods.getResetToken = function () {
+  const resetToken = crypto.randomBytes(25).toString("hex");
+
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.resetPasswordExpiresIn = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 // Returns user token
