@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import { User } from "../models/User";
 
 class TokenController {
@@ -13,16 +12,11 @@ class TokenController {
         return res.status(400).json({ errorMsg: "Your password is incorrect" });
       }
 
-      const tokenSecret = process.env.TOKEN_SECRET || "secret";
-      const tokenExpiration = process.env.TOKEN_EXPIRATION || "1d";
+      const { username, _id } = user;
 
-      const token = jwt.sign({ email }, tokenSecret, {
-        expiresIn: tokenExpiration,
-      });
+      const token = user.getSignedToken();
 
-      const { _id, name } = user;
-
-      return res.status(200).json({ _id, name, email, token });
+      return res.status(200).json({ username, email, _id, token });
     } catch (e) {
       console.log(e);
     }

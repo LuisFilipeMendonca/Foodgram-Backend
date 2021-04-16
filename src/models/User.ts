@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 interface IUser extends mongoose.Document {
   username: string;
@@ -36,8 +37,19 @@ userSchema.statics.build = (attr: IUser) => {
   return new User(attr);
 };
 
+// Validates password field
 userSchema.methods.isPasswordValid = async function (compPassword: string) {
   return await bcrypt.compare(compPassword, this.password);
+};
+
+// Returns user token
+userSchema.methods.getSignedToken = function () {
+  const tokenSecret = process.env.TOKEN_SECRET || "secret";
+  const tokenExpiration = process.env.TOKEN_EXPIRATION || "1d";
+
+  return jwt.sign({ email: this.email }, tokenSecret, {
+    expiresIn: tokenExpiration,
+  });
 };
 
 // Uses a pre-save hook to hash the password

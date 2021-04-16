@@ -8,7 +8,10 @@ class UserController {
 
       await user.save();
 
-      return res.status(200).json(user);
+      const { email, username, _id } = user;
+      const token = user.getSignedToken();
+
+      return res.status(200).json({ email, username, _id, token });
     } catch (e) {
       console.log(e);
     }
