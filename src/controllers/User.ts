@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
 import sendEmail from "../utils/sendEmail";
-import sgMail from "@sendgrid/mail";
+import crypto from "crypto";
 
 class UserController {
   async postUser(req: Request, res: Response) {
@@ -31,12 +31,7 @@ class UserController {
 
       const resetToken = user.getResetToken();
 
-      const { resetPasswordToken, resetPasswordExpiresIn } = user;
-
-      await User.updateOne(
-        { email },
-        { resetPasswordToken, resetPasswordExpiresIn }
-      );
+      await user.save();
 
       const resetUrl = `http://localhost:3000/password_reset/${resetToken}`;
 
@@ -54,17 +49,39 @@ class UserController {
           text: message,
         });
 
-        return res.status(201).json({ message: "Email Sent" });
+        return res.status(201).json({ message: "Email Sent", resetToken });
       } catch (e) {
-        await User.updateOne(
-          { email },
-          { resetPasswordToken: undefined, resetPasswordExpiresIn: undefined }
-        );
+        user.resetPasswordExpiresIn = undefined;
+        user.resetPasswordToken = undefined;
+        await user.save();
         console.log(e);
       }
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token } = req.params;
+      const { password } = req.body;
+
+      const resetToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      const user = await User.findOne({
+        resetPasswordToken: resetToken,
+        resetPasswordExpiresIn: { $gt: Date.now() },
+      });
+
+      user.password = password;
+
+      await user.save();
+
+      return res.status(201).json(user);
+    } catch (e) {}
   }
 }
 

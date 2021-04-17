@@ -85,12 +85,12 @@ userSchema.pre("save", async function (next) {
 });
 
 // Validates email field returning a Validation Error
-userSchema.path("email").validate(async (value: string) => {
-  const emailExists = await mongoose.models.User.countDocuments({
-    email: value,
-  });
-  return !emailExists;
-}, "Email already exists");
+// userSchema.path("email").validate(async (value: string) => {
+//   const emailExists = await mongoose.models.User.countDocuments({
+//     email: value,
+//   });
+//   return !emailExists;
+// }, "Email already exists");
 
 const User = mongoose.model<IUser, IUserModel>("User", userSchema);
 
