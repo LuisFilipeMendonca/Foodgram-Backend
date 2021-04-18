@@ -45,9 +45,11 @@ class RecipieController {
         .sort([sort])
         .skip(skip)
         .limit(+limit)
-        .populate("user", "name")
-        .populate("ratings", {
+        .populate("user", "username")
+        .populate({
+          path: "ratings",
           match: { user: userId || null },
+          select: "value",
         });
 
       const count = await Recipie.countDocuments();
@@ -70,13 +72,35 @@ class RecipieController {
 
   async getRecipieByName(req: Request, res: Response) {
     try {
-      const { recipieName } = req.params;
+      const { recipieName, page, limit, userId } = req.params;
+      const skip = (+page - 1) * +limit;
+
+      const { order } = req.query;
+
+      let sort;
+
+      if (order === "recent") sort = ["createdAt", -1];
+      if (order === "old") sort = ["createdAt", 1];
+      if (order === "highStars") sort = ["stars", -1];
+      if (order === "lowStars") sort = ["stars", 1];
 
       const recipies = await Recipie.find({
         name: { $regex: recipieName, $options: "i" },
+      })
+        .sort([sort])
+        .skip(skip)
+        .limit(+limit)
+        .populate({
+          path: "ratings",
+          match: { user: userId || null },
+          select: "value",
+        });
+
+      const count = await Recipie.countDocuments({
+        name: { $regex: recipieName, $options: "i" },
       });
 
-      return res.status(200).json(recipies);
+      return res.status(200).json({ recipies, count });
     } catch (e) {
       console.log(e);
     }

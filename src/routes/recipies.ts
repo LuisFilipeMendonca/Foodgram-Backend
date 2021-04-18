@@ -14,7 +14,10 @@ router.post(
   upload.single("photo"),
   recipieController.postRecipie
 );
-router.get("/by_name/:recipieName", recipieController.getRecipieByName);
+router.get(
+  "/by_name/:page/:limit/:recipieName/:userId?",
+  recipieController.getRecipieByName
+);
 router.get("/:page/:limit/:userId?", recipieController.getRecipies);
 router.get("/:id", recipieController.getRecipie);
 router.put("/:id", recipieController.updateRecipie);

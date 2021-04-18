@@ -6,7 +6,7 @@ class RatingController {
   async postRating(req: Request, res: Response) {
     try {
       const { _id } = res.locals.user;
-      const { value, recipie: recipieId } = req.body;
+      const { value, recipieId } = req.body;
 
       const rating = new Rating({ user: _id, value, recipie: recipieId });
       const recipie = await Recipie.findById(recipieId);
