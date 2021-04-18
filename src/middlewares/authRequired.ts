@@ -19,15 +19,13 @@ const loginRequired = async (
     const tokenSecret = process.env.TOKEN_SECRET || "secret";
     const userTokenData: any = jwt.verify(token, tokenSecret);
 
-    const user = await User.findOne({ email: userTokenData.email }).select(
-      "_id"
-    );
+    const user = await User.findOne({ email: userTokenData.email });
 
     if (!user) {
       return res.status(400).json({ errorMsg: "Your session has expired" });
     }
 
-    res.locals.userId = user;
+    res.locals.user = user;
 
     next();
   } catch (e) {

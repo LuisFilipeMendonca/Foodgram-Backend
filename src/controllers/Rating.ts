@@ -5,10 +5,10 @@ import { Recipie } from "../models/Recipie";
 class RatingController {
   async postRating(req: Request, res: Response) {
     try {
-      const { userId } = res.locals;
+      const { _id } = res.locals.user;
       const { value, recipie: recipieId } = req.body;
 
-      const rating = new Rating({ user: userId, value, recipie: recipieId });
+      const rating = new Rating({ user: _id, value, recipie: recipieId });
       const recipie = await Recipie.findById(recipieId);
 
       recipie.ratings.push(rating);

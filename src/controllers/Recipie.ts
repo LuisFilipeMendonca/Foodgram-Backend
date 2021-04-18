@@ -5,14 +5,16 @@ import { User } from "../models/User";
 class RecipieController {
   async postRecipie(req: Request, res: Response) {
     try {
+      const { _id } = res.locals.user;
+
       const data = {
         ...req.body,
         photo: req.file.filename,
-        user: res.locals.userId._id,
+        user: _id,
       };
 
       const recipie = Recipie.build(data);
-      const user = await User.findById(res.locals.userId._id);
+      const user = await User.findById(_id);
 
       user.recipies.push(recipie);
 
@@ -27,7 +29,7 @@ class RecipieController {
 
   async getRecipies(req: Request, res: Response) {
     try {
-      const { page, limit } = req.params;
+      const { page, limit, userId } = req.params;
       const skip = (+page - 1) * +limit;
 
       const { order } = req.query;
@@ -45,7 +47,7 @@ class RecipieController {
         .limit(+limit)
         .populate("user", "name")
         .populate("ratings", {
-          match: { user: res.locals.userId },
+          match: { user: userId || null },
         });
 
       const count = await Recipie.countDocuments();
@@ -61,6 +63,20 @@ class RecipieController {
       const recipie = await Recipie.findById(req.params.id);
 
       return res.status(200).json(recipie);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async getRecipieByName(req: Request, res: Response) {
+    try {
+      const { recipieName } = req.params;
+
+      const recipies = await Recipie.find({
+        name: { $regex: recipieName, $options: "i" },
+      });
+
+      return res.status(200).json(recipies);
     } catch (e) {
       console.log(e);
     }

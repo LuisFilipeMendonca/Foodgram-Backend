@@ -19,6 +19,16 @@ class UserController {
     }
   }
 
+  async getUser(req: Request, res: Response) {
+    try {
+      const { _id, email, username } = res.locals.user;
+
+      return res.status(200).json({ _id, email, username });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   async forgottenPassword(req: Request, res: Response) {
     try {
       const { email } = req.body;
@@ -76,7 +86,13 @@ class UserController {
         resetPasswordExpiresIn: { $gt: Date.now() },
       });
 
+      if (!user) {
+        return res.status(400).json({ message: "Token have expired" });
+      }
+
       user.password = password;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpiresIn = undefined;
 
       await user.save();
 
