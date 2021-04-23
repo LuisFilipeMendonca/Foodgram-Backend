@@ -21,9 +21,19 @@ class RecipieController {
       await user.save();
       await recipie.save();
 
-      return res.status(200).json(recipie);
+      return res.status(201).json(recipie);
     } catch (e) {
-      console.log(e);
+      let message: string = "Something went wrong. Try again later";
+      let data = [];
+      let statusCode = 500;
+
+      if (e.name === "ValidationError") {
+        data = Object.values(e.errors).map((error: any) => error.message);
+        statusCode = 422;
+        message = "Invalid input values";
+      }
+
+      return res.status(statusCode).json({ success: false, message, data });
     }
   }
 
@@ -56,7 +66,12 @@ class RecipieController {
 
       return res.status(200).json({ recipies, count });
     } catch (e) {
-      console.log(e);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Something went wrong. Try again later",
+        });
     }
   }
 
@@ -66,7 +81,12 @@ class RecipieController {
 
       return res.status(200).json(recipie);
     } catch (e) {
-      console.log(e);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Something went wrong. Try again later",
+        });
     }
   }
 
@@ -102,7 +122,12 @@ class RecipieController {
 
       return res.status(200).json({ recipies, count });
     } catch (e) {
-      console.log(e);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Something went wrong. Try again later",
+        });
     }
   }
 
@@ -116,7 +141,17 @@ class RecipieController {
 
       return res.status(200).json(recipie);
     } catch (e) {
-      console.log(e);
+      let message: string = "Something went wrong. Try again later";
+      let data = [];
+      let statusCode = 500;
+
+      if (e.name === "ValidationError") {
+        data = Object.values(e.errors).map((error: any) => error.message);
+        statusCode = 422;
+        message = "Invalid input values";
+      }
+
+      return res.status(statusCode).json({ success: false, message, data });
     }
   }
 
@@ -126,7 +161,12 @@ class RecipieController {
 
       return res.status(200).json(recipie);
     } catch (e) {
-      console.log(e);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Something went wrong. Try again later.",
+        });
     }
   }
 }

@@ -20,7 +20,7 @@ router.get(
 );
 router.get("/:page/:limit/:userId?", recipieController.getRecipies);
 router.get("/:id", recipieController.getRecipie);
-router.put("/:id", recipieController.updateRecipie);
+router.put("/:id", upload.single("photo"), recipieController.updateRecipie);
 router.delete("/:id", recipieController.deleteRecipie);
 
 export default router;

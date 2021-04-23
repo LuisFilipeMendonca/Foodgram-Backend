@@ -1,31 +1,44 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import sendEmail from "../utils/sendEmail";
 import crypto from "crypto";
 
 class UserController {
-  async postUser(req: Request, res: Response) {
+  async postUser(req: Request, res: Response, next: NextFunction) {
     try {
       const user = User.build(req.body);
 
       await user.save();
 
-      const { email, username, _id } = user;
+      const { email, username, _id, recipies } = user;
       const token = user.getSignedToken();
 
-      return res.status(200).json({ email, username, _id, token });
+      return res.status(201).json({ email, username, _id, token, recipies });
     } catch (e) {
-      console.log(e);
+      let message: string = "Something went wrong. Try again later";
+      let data = [];
+      let statusCode = 500;
+
+      if (e.name === "ValidationError") {
+        data = Object.values(e.errors).map((error: any) => error.message);
+        statusCode = 422;
+        message = "Invalid input values";
+      }
+
+      return res.status(statusCode).json({ success: false, message, data });
     }
   }
 
   async getUser(req: Request, res: Response) {
     try {
-      const { _id, email, username } = res.locals.user;
+      const { _id, email, username, recipies } = res.locals.user;
 
-      return res.status(200).json({ _id, email, username });
+      return res.status(200).json({ _id, email, username, recipies });
     } catch (e) {
-      console.log(e);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later",
+      });
     }
   }
 
@@ -36,7 +49,9 @@ class UserController {
       const user = await User.findOne({ email });
 
       if (!user) {
-        return res.status(404).json({ errorMsg: "Invalid credentials" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid credentials" });
       }
 
       const resetToken = user.getResetToken();
@@ -59,15 +74,21 @@ class UserController {
           text: message,
         });
 
-        return res.status(201).json({ message: "Email Sent", resetToken });
+        return res.status(201).json({ message: "Email Sent", success: true });
       } catch (e) {
         user.resetPasswordExpiresIn = undefined;
         user.resetPasswordToken = undefined;
         await user.save();
-        console.log(e);
+        return res.status(400).json({
+          success: false,
+          message: "Verification email not sent. Try again later.",
+        });
       }
     } catch (e) {
-      console.log(e);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later",
+      });
     }
   }
 
@@ -87,7 +108,9 @@ class UserController {
       });
 
       if (!user) {
-        return res.status(400).json({ message: "Token have expired" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Token have expired" });
       }
 
       user.password = password;
@@ -97,7 +120,19 @@ class UserController {
       await user.save();
 
       return res.status(201).json(user);
-    } catch (e) {}
+    } catch (e) {
+      let message: string = "Something went wrong. Try again later";
+      let data = [];
+      let statusCode = 500;
+
+      if (e.name === "ValidationError") {
+        data = Object.values(e.errors).map((error: any) => error.message);
+        statusCode = 422;
+        message = "Invalid input values";
+      }
+
+      return res.status(statusCode).json({ success: false, message, data });
+    }
   }
 }
 

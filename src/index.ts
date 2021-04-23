@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";

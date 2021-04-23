@@ -1,24 +1,35 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 
 class TokenController {
-  async postToken(req: Request, res: Response) {
+  async postToken(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate("recipies");
 
-      if (!(await user.isPasswordValid(password))) {
-        return res.status(400).json({ errorMsg: "Your password is incorrect" });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid credentials" });
       }
 
-      const { username, _id } = user;
+      if (!(await user.isPasswordValid(password))) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid credentials" });
+      }
+
+      const { username, _id, recipies } = user;
 
       const token = user.getSignedToken();
 
-      return res.status(200).json({ username, email, _id, token });
+      return res.status(201).json({ username, email, _id, token, recipies });
     } catch (e) {
-      console.log(e);
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later.",
+      });
     }
   }
 }

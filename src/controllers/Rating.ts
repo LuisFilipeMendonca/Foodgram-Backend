@@ -18,9 +18,14 @@ class RatingController {
       await recipie.save();
       await rating.save();
 
-      return res.status(200).json({ rating });
+      return res.status(201).json({ _id: rating._id });
     } catch (e) {
-      console.log(e);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Something went wrong. Try again later.",
+        });
     }
   }
 
@@ -39,7 +44,12 @@ class RatingController {
 
       return res.status(200).json({ msg: "Rating deleted successfully" });
     } catch (e) {
-      console.log(e);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Something went wrong. Try again later.",
+        });
     }
   }
 }
