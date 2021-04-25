@@ -66,12 +66,10 @@ class RecipieController {
 
       return res.status(200).json({ recipies, count });
     } catch (e) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Something went wrong. Try again later",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later",
+      });
     }
   }
 
@@ -81,12 +79,10 @@ class RecipieController {
 
       return res.status(200).json(recipie);
     } catch (e) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Something went wrong. Try again later",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later",
+      });
     }
   }
 
@@ -122,12 +118,10 @@ class RecipieController {
 
       return res.status(200).json({ recipies, count });
     } catch (e) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Something went wrong. Try again later",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later",
+      });
     }
   }
 
@@ -161,12 +155,55 @@ class RecipieController {
 
       return res.status(200).json(recipie);
     } catch (e) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Something went wrong. Try again later.",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later.",
+      });
+    }
+  }
+
+  async postFavorite(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const { user } = res.locals;
+
+      user.favorites.push(id);
+      await user.save();
+
+      return res.status(201).json({
+        success: true,
+        message: "Recipie successfully added to favorites",
+      });
+    } catch (e) {
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later.",
+      });
+    }
+  }
+
+  async deleteFavorites(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const { user } = res.locals;
+
+      user.favorites = user.favorites.filter(
+        (favorite: any) => favorite.id !== id
+      );
+
+      await user.save();
+
+      return res.status(201).json({
+        success: true,
+        message: "Recipie successfully remove from favorites",
+      });
+    } catch (e) {
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later.",
+      });
     }
   }
 }

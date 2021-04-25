@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     minLength: [6, "Your password must have at least 6 characters"],
   },
   recipies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipie" }],
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipie" }],
   resetPasswordToken: String,
   resetPasswordExpiresIn: Date,
 });

@@ -20,7 +20,18 @@ router.get(
 );
 router.get("/:page/:limit/:userId?", recipieController.getRecipies);
 router.get("/:id", recipieController.getRecipie);
-router.put("/:id", upload.single("photo"), recipieController.updateRecipie);
-router.delete("/:id", recipieController.deleteRecipie);
+router.put(
+  "/:id",
+  authRequired,
+  upload.single("photo"),
+  recipieController.updateRecipie
+);
+router.delete("/:id", authRequired, recipieController.deleteRecipie);
+router.post("/add_favorites/:id", authRequired, recipieController.postFavorite);
+router.delete(
+  "/delete_favorites/:id",
+  authRequired,
+  recipieController.deleteFavorites
+);
 
 export default router;
