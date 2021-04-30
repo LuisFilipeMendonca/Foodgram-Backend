@@ -132,9 +132,15 @@ class RecipieController {
 
   async updateRecipie(req: Request, res: Response) {
     try {
+      let data = { ...req.body };
+
+      if (req.file && req.file.filename) {
+        data = { ...data, photo: req.file.filename };
+      }
+
       const recipie = await Recipie.findByIdAndUpdate(
         req.params.id,
-        { $set: { ...req.body } },
+        { $set: { ...data } },
         { new: true }
       );
 

@@ -76,7 +76,10 @@ class UserController {
           text: message,
         });
 
-        return res.status(201).json({ message: "Email Sent", success: true });
+        return res.status(201).json({
+          message: "A reset password email was sent to your email",
+          success: true,
+        });
       } catch (e) {
         user.resetPasswordExpiresIn = undefined;
         user.resetPasswordToken = undefined;
@@ -121,7 +124,12 @@ class UserController {
 
       await user.save();
 
-      return res.status(201).json(user);
+      return res
+        .status(201)
+        .json({
+          success: true,
+          message: "Your password was updated successfully",
+        });
     } catch (e) {
       let message: string = "Something went wrong. Try again later";
       let data = [];
