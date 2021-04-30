@@ -9,6 +9,7 @@ interface IRecipie extends mongoose.Document {
   level: string;
   votes: number;
   votesCount: number;
+  currentRating: number;
   ingredients: string[];
   steps: string[];
   user: mongoose.Schema.Types.ObjectId;
@@ -49,6 +50,10 @@ const recipieSchema = new mongoose.Schema<IRecipie, IRecipieModel>(
       default: 0,
     },
     votesCount: {
+      type: Number,
+      default: 0,
+    },
+    currentRating: {
       type: Number,
       default: 0,
     },

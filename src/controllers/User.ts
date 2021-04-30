@@ -31,9 +31,11 @@ class UserController {
 
   async getUser(req: Request, res: Response) {
     try {
-      const { _id, email, username, recipies } = res.locals.user;
+      const { _id, email, username, recipies, favorites } = res.locals.user;
 
-      return res.status(200).json({ _id, email, username, recipies });
+      return res
+        .status(200)
+        .json({ _id, email, username, recipies, favorites });
     } catch (e) {
       return res.status(500).json({
         success: false,

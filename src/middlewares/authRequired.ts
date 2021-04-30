@@ -25,9 +25,15 @@ const loginRequired = async (
     const user = await User.findOne({ email: userTokenData.email }).populate([
       {
         path: "recipies",
-        options: { sort: { createdAt: -1 } },
+        options: {
+          sort: { createdAt: -1 },
+          populate: { path: "user", select: "username" },
+        },
       },
-      { path: "favorites" },
+      {
+        path: "favorites",
+        options: { populate: { path: "user", select: "username" } },
+      },
     ]);
 
     if (!user) {

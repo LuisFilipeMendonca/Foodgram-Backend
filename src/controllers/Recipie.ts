@@ -2,6 +2,17 @@ import { Request, Response } from "express";
 import { Recipie } from "../models/Recipie";
 import { User } from "../models/User";
 
+const buildSortArr = (sortValue: string) => {
+  let sort;
+
+  if (sortValue === "recent") sort = ["createdAt", -1];
+  if (sortValue === "old") sort = ["createdAt", 1];
+  if (sortValue === "highStars") sort = ["currentRating", -1];
+  if (sortValue === "lowStars") sort = ["currentRating", 1];
+
+  return sort;
+};
+
 class RecipieController {
   async postRecipie(req: Request, res: Response) {
     try {
@@ -21,7 +32,11 @@ class RecipieController {
       await user.save();
       await recipie.save();
 
-      return res.status(201).json(recipie);
+      return res.status(201).json({
+        recipie,
+        success: true,
+        message: "Recipie added successfully",
+      });
     } catch (e) {
       let message: string = "Something went wrong. Try again later";
       let data = [];
@@ -44,12 +59,7 @@ class RecipieController {
 
       const { order } = req.query;
 
-      let sort;
-
-      if (order === "recent") sort = ["createdAt", -1];
-      if (order === "old") sort = ["createdAt", 1];
-      if (order === "highStars") sort = ["stars", -1];
-      if (order === "lowStars") sort = ["stars", 1];
+      let sort = buildSortArr(order?.toString() || "");
 
       const recipies = await Recipie.find()
         .sort([sort])
@@ -93,12 +103,7 @@ class RecipieController {
 
       const { order } = req.query;
 
-      let sort;
-
-      if (order === "recent") sort = ["createdAt", -1];
-      if (order === "old") sort = ["createdAt", 1];
-      if (order === "highStars") sort = ["stars", -1];
-      if (order === "lowStars") sort = ["stars", 1];
+      let sort = buildSortArr(order?.toString() || "");
 
       const recipies = await Recipie.find({
         name: { $regex: recipieName, $options: "i" },
@@ -133,7 +138,11 @@ class RecipieController {
         { new: true }
       );
 
-      return res.status(200).json(recipie);
+      return res.status(200).json({
+        recipie,
+        success: true,
+        message: "Recipie updated successfully",
+      });
     } catch (e) {
       let message: string = "Something went wrong. Try again later";
       let data = [];
@@ -151,9 +160,13 @@ class RecipieController {
 
   async deleteRecipie(req: Request, res: Response) {
     try {
-      const recipie = await Recipie.findByIdAndDelete(req.params.id);
+      await Recipie.findByIdAndDelete(req.params.id);
 
-      return res.status(200).json(recipie);
+      return res.status(200).json({
+        id: req.params.id,
+        success: true,
+        message: "Recipie deleted successfully",
+      });
     } catch (e) {
       return res.status(500).json({
         success: false,

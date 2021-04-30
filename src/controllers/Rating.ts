@@ -14,18 +14,17 @@ class RatingController {
       recipie.ratings.push(rating);
       recipie.votes += value;
       recipie.votesCount += 1;
+      recipie.currentRating = recipie.votes / recipie.votesCount;
 
       await recipie.save();
       await rating.save();
 
       return res.status(201).json({ _id: rating._id });
     } catch (e) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Something went wrong. Try again later.",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later.",
+      });
     }
   }
 
@@ -39,17 +38,23 @@ class RatingController {
       recipie.ratings.pull({ _id: id });
       recipie.votes -= rating.value;
       recipie.votesCount -= 1;
+      recipie.currentRating = recipie.votes / recipie.votesCount;
 
       await recipie.save();
 
-      return res.status(200).json({ msg: "Rating deleted successfully" });
-    } catch (e) {
       return res
-        .status(500)
+        .status(200)
         .json({
-          success: false,
-          message: "Something went wrong. Try again later.",
+          success: true,
+          msg: "Rating deleted successfully",
+          votes: recipie.votes,
+          votesCount: recipie.votesCount,
         });
+    } catch (e) {
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Try again later.",
+      });
     }
   }
 }
