@@ -47,7 +47,7 @@ mkdir images
 
 ```sh
 cd project_folder
-npm run dev
+npm start
 ```
 
 By default the application will run on [http://localhost:3001](http://localhost:3001).
